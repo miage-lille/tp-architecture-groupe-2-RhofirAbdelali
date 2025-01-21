@@ -8,7 +8,9 @@ type WebinarProps = {
   startDate: Date;
   endDate: Date;
   seats: number;
+  remainingSeats: number;
 };
+
 export class Webinar extends Entity<WebinarProps> {
   isTooSoon(now: Date): boolean {
     const diff = differenceInDays(this.props.startDate, now);
@@ -20,10 +22,17 @@ export class Webinar extends Entity<WebinarProps> {
   }
 
   hasNotEnoughSeats(): boolean {
-    return this.props.seats < 1;
+    return this.props.remainingSeats < 1;
   }
 
-  isOrganizer(userId: string) {
+  isOrganizer(userId: string): boolean {
     return this.props.organizerId === userId;
+  }
+
+  reduceSeats(): void {
+    if (this.hasNotEnoughSeats()) {
+      throw new Error('Not enough seats available.');
+    }
+    this.props.remainingSeats -= 1;
   }
 }
